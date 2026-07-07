@@ -1,0 +1,30 @@
+xysh@xysh:~$ python3 robot_simulator.py 
+[INFO] [1783388792.758655963] [robot_simulator]: 摄像头已打开 (设备 0)
+[INFO] [1783388793.303299428] [robot_simulator]: PCD格式: binary, 点数: 581820
+[INFO] [1783388793.303861824] [robot_simulator]: 加载点云: 581820 个点 (test.pcd)
+[INFO] [1783388793.304147777] [robot_simulator]: 机器人模拟器启动中...
+[INFO] [1783388793.312643987] [robot_simulator]: 机器人模拟器启动完成
+Traceback (most recent call last):
+  File "/home/xysh/robot_simulator.py", line 509, in <module>
+    main()
+  File "/home/xysh/robot_simulator.py", line 498, in main
+    rclpy.spin(node)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py", line 229, in spin
+    executor.spin_once()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 808, in spin_once
+    self._spin_once_impl(timeout_sec)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 805, in _spin_once_impl
+    raise handler.exception()
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/task.py", line 272, in _execute_coroutine_step
+    result = coro.send(None)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 488, in handler
+    await call_coroutine(entity, arg)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 396, in _execute_timer
+    await await_or_execute(tmr.callback)
+  File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 110, in await_or_execute
+    return callback(*args)
+  File "/home/xysh/robot_simulator.py", line 243, in update
+    self._publish_pointcloud()
+  File "/home/xysh/robot_simulator.py", line 375, in _publish_pointcloud
+    msg.count = msg.width
+AttributeError: 'PointCloud2' object has no attribute 'count'
