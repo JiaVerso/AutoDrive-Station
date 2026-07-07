@@ -75,7 +75,7 @@ Step 6: 提交 Pull Request (PR) 与 Code Review
 
 (合并完成后，你可以选择删除远程的 xxx_dev 分支，下次开发重新从 dev 检出，或者保留该分支继续提交。)
 
-3. 📝 Commit 提交规范建议
+# 3. 📝 Commit 提交规范建议
 
 为了方便回溯代码历史，我们在 git commit -m 时推荐使用以下前缀标识：
 
