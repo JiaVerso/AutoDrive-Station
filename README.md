@@ -37,7 +37,7 @@ git checkout -b xxx_dev
 
 Step 3: 在个人分支上开发并提交
 
-在 jia_dev 分支上愉快地写代码。写完一个阶段性功能后，将修改提交到本地：
+在 xxx_dev 分支上愉快地写代码。写完一个阶段性功能后，将修改提交到本地：
 
 # 暂存所有修改
 ```
@@ -53,7 +53,9 @@ Step 4: 同步最新代码 (防冲突神器 ⭐️)
 在你写代码的这几个小时里，其他成员可能已经合并了新代码到 dev。在推送到云端前，必须先拉取最新的 dev 代码合并到你的个人分支，在本地解决掉可能存在的冲突：
 
 # 拉取远程最新 dev 分支，并将其合并到你当前的个人分支
+```
 git pull origin dev
+```
 # (如果提示有冲突，请在编辑器中手动解决冲突后，重新 add 并 commit)
 
 
@@ -64,7 +66,7 @@ Step 5: 推送个人分支到 GitHub
 git push origin xxx_dev
 ```
 
-Step 6: 提交 Pull Request (PR) 与 Code Review
+Step 6: ** 提交 Pull Request (PR) 与 Code Review **
 
 登录 GitHub 仓库主页。
 
