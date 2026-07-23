@@ -1,70 +1,124 @@
 # 智能巡检小车控制平台（AutoDrive-Station）
 
-基于 Vue3 + TypeScript + Element Plus 构建的智能巡检机器人平台控制系统前端应用，支持与 ROS2 Bridge 实时通信，提供地图可视化、导航控制、3D点云渲染和摄像头监控等功能。
+基于 Vue 3 + TypeScript + ROS2 (Humble) + Nav2 构建的智能巡检机器人平台控制系统，支持 Web 端遥控、地图高精编辑、多航点巡检任务链调度及实时状态监测。
 
-## 功能特性
+---
 
-- **地图擦除与修补**：在网页上直接用画笔和橡皮擦对 ROS 2 地图进行实时修改，擦掉噪点后一键保存覆盖小车本地地图
-- **拖拽式任务链条**：像搭积木一样，把"导航到某点"、"去充电"、"原地等待"等卡片拖到画布里串成一条线，点击"一键启动"
-- **动态地址，跨设备可用**：前端自动读取连接的小车真实 IP，哪怕前端不在小车上跑也能畅通保存
+## 目录结构 (Directory Architecture)
 
-### 主界面布局
+```text
+SparkMoveCarWeb/
+├── linux/                          # ROS2 后端 Python 核心服务
+│   ├── inspection_controller.py    # 巡检控制核心 (AMCL位姿校验 / Nav2联动)
+│   ├── map_edit_server.py          # 地图编辑 / 禁行区 / POI 保存服务
+│   ├── task_chain_manager.py       # 巡检任务链与多航点调度管理
+│   ├── unified_backend.py          # 统一后端启动入口
+│   └── robot_simulator.py          # (可选) 仿真测试脚本
+├── src/                            # Vue3 前端源码
+│   ├── components/                 # 组件目录
+│   │   ├── Header.vue              # 顶部导航栏
+│   │   ├── LeftToolbar.vue         # 左侧工具栏
+│   │   ├── MapCanvas.vue           # 地图画布（2D渲染）
+│   │   ├── RightPanel.vue          # 右侧控制面板
+│   │   ├── BottomBar.vue           # 底部状态栏
+│   │   ├── DataPanel.vue           # 数据面板（ROS话题）
+│   │   ├── FollowCameraPopup.vue   # 摄像头跟随弹窗
+│   │   └── TaskChain.vue           # 任务链组件
+│   ├── stores/                     # Pinia 状态管理
+│   │   ├── robot.ts                # 机器人状态与 ROS 通信
+│   │   ├── map.ts                  # 地图状态与点云处理
+│   │   ├── navigation.ts           # 导航状态与航点管理
+│   │   └── taskChain.ts            # 任务链状态
+│   ├── api/
+│   │   └── ros.ts                  # ROS 接口（roslib 实现）
+│   ├── utils/
+│   │   ├── coordinateConverter.ts  # 坐标转换
+│   │   └── pointCloudParser.ts     # 点云解析
+│   ├── mock/data.ts                # Mock 数据
+│   ├── styles/
+│   │   ├── global.scss             # 全局样式
+│   │   └── variables.scss          # 样式变量
+│   ├── types/index.ts              # TypeScript 类型定义
+│   ├── workers/camera.worker.ts    # 摄像头 Worker
+│   ├── composables/                # 组合式函数
+│   │   ├── useFollowMode.ts
+│   │   └── useTheme.ts
+│   ├── App.vue                     # 根组件
+│   └── main.ts                     # 入口文件
+├── public/                         # 静态资源
+├── index.html                      # HTML 模板
+├── package.json                    # 项目配置
+├── vite.config.ts                  # Vite 配置
+├── tsconfig.json                   # TypeScript 配置
+├── 智能巡检平台控制系统_PRD.md       # 产品需求文档
+└── README.md                       # 项目说明
+```
 
-- **左侧导航栏**：建图、导航、摄像头、SLAM云四个模块切换
-- **中央地图区域**：基于 Canvas 的 2D SLAM 地图渲染，支持缩放、拖拽、点云实时显示
-- **右侧控制面板**：根据左侧选择显示对应模块的详细控制界面
-- **底部状态栏**：实时监控 FPS、ROS 状态、WebSocket 状态、系统资源占用
+---
 
-### 地图功能
+## 环境部署与准备 (Prerequisites)
 
-- 地图加载与保存、建图模式、重定位功能
-- 地图缩放与拖拽、机器人位置标记与方向指示
-- 2D点云实时显示（来自多个雷达话题）
+| 环境 | 版本要求 | 说明 |
+|------|----------|------|
+| 操作系统 | Ubuntu 22.04 LTS | ROS2 Humble 官方支持平台 |
+| ROS2 | Humble Hawksbill | 导航栈 Nav2 |
+| Node.js | >= 18.x | 前端构建运行 |
+| npm | >= 9.x | 包管理器 |
+| Python | >= 3.10 | 后端核心脚本运行 |
 
-### 导航功能
+**Python 核心依赖：**
 
-- **航点绘制**：点击地图添加单个航点，或连续绘制航线
-- **路线管理**：保存、加载、删除路线
-- **导航控制**：开始、暂停、继续、取消导航
+- `rclpy`
+- `nav2_simple_commander`
+- `geometry_msgs`
+- `nav_msgs`
 
-### 手动控制
+---
 
-- 方向控制：前后左右移动、停止、急停按钮
-- 速度调节：线速度、角速度滑块
+## Linux 后端服务启动 (Linux Backend)
 
-## 技术栈
-
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| Vue | 3.5.x | 前端框架 |
-| TypeScript | 6.0.x | 类型安全 |
-| Vite | 8.1.x | 构建工具 |
-| Element Plus | 2.14.x | UI组件库 |
-| Pinia | 3.0.x | 状态管理 |
-| SCSS | 1.101.x | CSS预处理器 |
-| Three.js | 0.158.x | 3D点云渲染 |
-| roslib | 2.1.x | ROS2 WebSocket通信 |
-
-## 快速开始
-
-### 环境要求
-
-- Node.js >= 18.0.0
-- npm >= 9.0.0
-- Ubuntu 22.04 + ROS2 Humble（后端）
-
-### 安装与运行
+### 步骤一：加载 ROS2 及导航工作区环境变量
 
 ```bash
-# 安装依赖
+source /opt/ros/humble/setup.bash
+# 替换为你的 ROS2 导航工作区实际路径
+source ~/Desktop/SparkCar_ROS2_WS/SparkCar_Navigation/install/setup.bash
+```
+
+### 步骤二：运行后端核心服务（三选一或统一启动）
+
+**方式 A（推荐 unified 统一后端）：**
+
+```bash
+python3 linux/unified_backend.py
+```
+
+**方式 B（按需单独启动核心模块）：**
+
+```bash
+# 终端 1：启动巡检控制器
+python3 linux/inspection_controller.py
+
+# 终端 2：启动地图编辑服务端
+python3 linux/map_edit_server.py
+
+# 终端 3：启动任务链管理器
+python3 linux/task_chain_manager.py
+```
+
+---
+
+## Web 前端启动 (Web Frontend)
+
+```bash
+# 1. 安装项目依赖
 npm install
 
-# 开发模式运行
+# 2. 启动开发服务器
 npm run dev
-
-# 访问地址
-# http://localhost:5173
 ```
+
+启动成功后，浏览器访问：**http://localhost:5173**
 
 ### 生产构建
 
@@ -73,58 +127,16 @@ npm run build
 npm run preview
 ```
 
-## 项目结构
+---
 
-```
-仓库根目录/
-├── src/
-│   ├── components/          # 组件目录
-│   │   ├── Header.vue       # 顶部导航栏
-│   │   ├── LeftToolbar.vue  # 左侧工具栏
-│   │   ├── MapCanvas.vue    # 地图画布（2D渲染）
-│   │   ├── RightPanel.vue   # 右侧控制面板
-│   │   ├── BottomBar.vue    # 底部状态栏
-│   │   ├── DataPanel.vue    # 数据面板（ROS话题）
-│   │   ├── FollowCameraPopup.vue  # 摄像头跟随弹窗
-│   │   └── TaskChain.vue    # 任务链组件
-│   ├── stores/              # Pinia状态管理
-│   │   ├── robot.ts         # 机器人状态与ROS通信
-│   │   ├── map.ts           # 地图状态与点云处理
-│   │   ├── navigation.ts    # 导航状态与航点管理
-│   │   └── taskChain.ts     # 任务链状态
-│   ├── api/
-│   │   └── ros.ts           # ROS接口（roslib实现）
-│   ├── utils/
-│   │   ├── coordinateConverter.ts  # 坐标转换
-│   │   └── pointCloudParser.ts     # 点云解析
-│   ├── mock/data.ts         # Mock数据
-│   ├── styles/
-│   │   ├── global.scss      # 全局样式
-│   │   └── variables.scss   # 样式变量
-│   ├── types/index.ts       # TypeScript类型定义
-│   ├── workers/camera.worker.ts  # 摄像头Worker
-│   ├── composables/         # 组合式函数
-│   │   ├── useFollowMode.ts
-│   │   └── useTheme.ts
-│   ├── App.vue              # 根组件
-│   └── main.ts              # 入口文件
-├── public/                  # 静态资源
-├── index.html               # HTML模板
-├── package.json             # 项目配置
-├── vite.config.ts           # Vite配置
-├── tsconfig.json            # TypeScript配置
-├── 智能巡检平台控制系统_PRD.md  # 产品需求文档
-└── README.md                # 项目说明
-```
-
-## ROS2 通信配置
+## ROS2 通信配置 (ROS2 Configurations)
 
 ### 自动订阅话题
 
 | 话题 | 消息类型 | 说明 |
 |------|----------|------|
 | `/amcl_pose` | `geometry_msgs/msg/PoseWithCovarianceStamped` | 机器人位姿 |
-| `/map` | `nav_msgs/msg/OccupancyGrid` | 2D栅格地图 |
+| `/map` | `nav_msgs/msg/OccupancyGrid` | 2D 栅格地图 |
 | `/inspection_status` | `std_msgs/msg/String` | 任务状态反馈 |
 
 ### 发布话题
@@ -135,11 +147,13 @@ npm run preview
 | `/inspection_control` | `std_msgs/msg/String` | 巡检控制指令 |
 | `/navigate_through_poses` | `nav2_msgs/action/NavigateThroughPoses` | 多航点巡检任务 |
 
-## 注意事项
+### 注意事项
 
-- 需要运行 ROS2 Bridge 后端服务才能接收真实数据
-- 连接地址格式：`ws://<IP>:<PORT>`，默认端口 9090
-- 建议使用 Chrome 浏览器以获得最佳体验
+- **ROSBridge 接口：** 确保前端通过 `ws://<机器人IP>:9090` 连接到 `rosbridge_websocket`。
+- **AMCL 重定位说明：** `inspection_controller.py` 内置 AMCL 定位保护逻辑。发起巡检前，请先在 RViz 中通过 **2D Pose Estimate** 或从 Web 端设置机器人初始位姿。
+- 建议使用 Chrome 浏览器以获得最佳体验。
+
+---
 
 ## License
 
