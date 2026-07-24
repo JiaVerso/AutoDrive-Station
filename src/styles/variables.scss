@@ -1,0 +1,58 @@
+// ============================================================
+// SCSS 变量层
+// 仅做「桥接」：把组件里已使用的 $xxx 映射到 CSS 自定义属性，
+// 真正的色值由 global.scss 中 html.light / html.dark 决定，
+// 从而通过切换 <html> 的 class 实现整站一键换肤。
+// ============================================================
+
+// 背景 / 表面
+$bg-primary:   var(--bg-main);
+$bg-secondary: var(--bg-panel);
+$bg-card:      var(--bg-card);
+$bg-card-2:    var(--bg-card-2);
+$bg-hover:     var(--bg-hover);
+$bg-input:     var(--bg-input);
+$border-color: var(--border-color);
+$border-subtle: var(--border-subtle);
+$border-active: var(--border-active);
+
+// 文字
+$text-primary:   var(--text-primary);
+$text-secondary: var(--text-secondary);
+$text-muted:     var(--text-muted);
+
+// 品牌高亮
+$accent-blue:       var(--accent-blue);
+$accent-blue-dark:  var(--accent-blue-dark);
+$accent-blue-soft:  var(--accent-blue-soft);
+
+// 主题主色（随主题绑定：亮色=科技蓝 / 暗色=极客红）
+$theme-primary:        var(--theme-primary);
+$theme-primary-hover:  var(--theme-primary-hover);
+$theme-primary-dark:   var(--theme-primary-dark);
+$theme-primary-active: var(--theme-primary-active);
+$active-menu-bg:       var(--active-menu-bg);
+$active-menu-border:   var(--active-menu-border);
+$slider-color:         var(--slider-color);
+$btn-primary-bg:       var(--btn-primary-bg);
+$theme-primary-soft:   var(--theme-primary-soft);
+$accent-green:      var(--accent-green);
+$accent-yellow:     var(--accent-yellow);
+$accent-red:        var(--accent-red);
+$accent-red-hover:  var(--accent-red-hover);
+$accent-cyan:       var(--accent-cyan);
+
+// 中央画布
+$canvas-bg:    var(--bg-canvas);
+$canvas-bg-2:  var(--bg-canvas-2);
+$canvas-text:  var(--canvas-text);
+$canvas-ring:  var(--canvas-ring);
+
+// 形状 / 动效
+$radius: 6px;
+$transition: 200ms ease;
+$shadow: var(--shadow);
+$header-height: 56px;
+$bottom-height: 36px;
+$left-toolbar-width: 248px;
+$right-panel-width: 320px;
